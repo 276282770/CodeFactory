@@ -25,6 +25,9 @@ namespace Codu
 
             Stack<SysKeyEnum> stackSysKey = new Stack<SysKeyEnum>();
             JObject currentData = data;
+
+            
+            
             int ln = 1;
             while (true)
             {
@@ -104,6 +107,13 @@ namespace Codu
                         {
 
                         }
+                        //userDefault
+                        else if ((matchSysKey = Regex.Match(expression, @"^\w+$")).Success)
+                        {
+
+                        }
+                        else
+                            throw new Exception($"无法识别 {expression}");
 
                     }
             }
@@ -112,11 +122,23 @@ namespace Codu
             ln++;
         }
 
-        void HandleIF()
+        void HandleSK(SysKeyEnum sk)
         {
 
         }
+        void ReadString(string line)
+        {
 
+        }
+        SysKeyEnum AnalysisSysKey(string skSourceStr,out string[] paras)
+        {
+            paras = null;
+            SysKeyEnum sk = SysKeyEnum.Understand;
+
+
+            return sk;
+        }
+        
 
 
         public static bool CheckModeFile(string modeFile, out string error)
@@ -131,7 +153,8 @@ namespace Codu
             ELSE,
             ELSEIF,
             END,
-
+            UserDefault,
+            Understand
         }
     }
 
