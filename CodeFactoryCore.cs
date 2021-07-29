@@ -35,6 +35,7 @@ namespace Codu
                 if (s == null)
                     break;
                 var matchs = Regex.Matches(s, flagPattern, RegexOptions.IgnoreCase);
+
                 if (matchs.Count == 0)
                 {
                     sw.WriteLine(s);
@@ -126,7 +127,77 @@ namespace Codu
         {
 
         }
-        void ReadString(string line)
+        SysKeyEnum GetSysKey(string inner, out string[] para)
+        {
+            SysKeyEnum _keyEnum = SysKeyEnum.Understand;
+            para = null;
+            string[] keyPars = inner.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            if (keyPars.Length == 0)
+                return _keyEnum;
+
+            string key = keyPars[0];
+            key = key.ToUpper();
+
+            if (key == "FOR")
+            {
+                if (keyPars.Length == 2)
+                {
+                    _keyEnum = SysKeyEnum.FOR;
+                    para = new string[] { keyPars[1] };
+
+                }
+            }
+            else if (key == "IF")
+            {
+                if (keyPars.Length == 2)
+                {
+                    _keyEnum = SysKeyEnum.IF;
+                    para = new string[] { keyPars[1] };
+
+                }
+            }
+            else if (key == "ELSE")
+            {
+                if (keyPars.Length == 1)
+                {
+                    _keyEnum = SysKeyEnum.ELSE;
+                }
+                else if (keyPars.Length == 3 && keyPars[1].ToUpper()=="IF")
+                {
+                    _keyEnum = SysKeyEnum.ELSEIF;
+                    para = new string[] { keyPars[2] };
+                }
+            }
+            else if(key=="END" && keyPars.Length == 1)
+            {
+                _keyEnum = SysKeyEnum.END;
+            }
+            else if (keyPars.Length==1)
+            {
+                _keyEnum = SysKeyEnum.UserDefault;
+                para = new string[] { keyPars[0] };
+            }
+            if (!CheckSysKey(para))
+            {
+                _keyEnum = SysKeyEnum.Understand;
+                para = null;
+            }
+            return _keyEnum;
+        }
+        bool CheckSysKey(string word)
+        {
+            return Regex.IsMatch(word,@"^(FOR|IF|ELSE|ELSEIF|END|AND)$",RegexOptions.IgnoreCase);
+        }
+        bool CheckSysKey(string[] words)
+        {
+            if (words == null)
+                return true;
+            var has=words.Where(s => CheckSysKey(s)).ToList();
+            if (has .Count>0)
+                return false;
+            return true;
+        }
+        void ReadString(string txt)
         {
 
         }
@@ -146,15 +217,16 @@ namespace Codu
             error = null;
             return true;
         }
-        enum SysKeyEnum
+        public enum SysKeyEnum
         {
-            FOR,
             IF,
+            FOR,
+            END,
             ELSE,
             ELSEIF,
-            END,
-            UserDefault,
-            Understand
+            Reserved,
+            Understand,
+            UserDefault
         }
     }
 
